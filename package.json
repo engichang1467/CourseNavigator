@@ -1,0 +1,24 @@
+{
+  "name": "coursenavigator",
+  "version": "1.0.0",
+  "description": "A Discord bot that will show information of courses at school",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "start": "node ./src/bot.js",
+    "dev": "nodemon ./src/bot.js"
+  },
+  "author": "Michael Chang",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.3.1",
+    "dotenv": "^8.2.0",
+    "fs": "0.0.1-security",
+    "nodemon": "^2.0.4",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.1.3"
+  }
+}
