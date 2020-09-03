@@ -9,13 +9,14 @@ let everyCourseData = JSON.parse(rawdata2)
 
 // Desc: the main function that search up the course informations
 const findClass = (input) => {
+    // Base case 1: return error when user's input is not in the right format
     if (input.length === 1 || input.length > 2)
         return "Please type the course name and number like the example (ex. cmpt 300)"
 
     var className = input[0].toUpperCase()
     var checkClassExist = everyCourseData['children'][checkFaculty(className)]
 
-    // Base case 1: return nothing if the course name does not exist
+    // Base case 2: return 'course name not found' if the course name does not exist
     if (checkClassExist  === undefined) 
         return 'Sorry I can\'t find the course name, Please try again'
 
@@ -24,19 +25,20 @@ const findClass = (input) => {
 
     var checkClassNumExist = classNameCourses[checkClassNum(classNameCourses, input[1])]
     
-    // Base case 2: return nothing if the course number does not exist
+    // Base case 3: return 'course number not found' if the course number does not exist
     if (checkClassNumExist  === undefined) 
         return 'Sorry I can\'t find the course number, Please try again'
 
     var classNumCourses = checkClassNumExist['children']                                            // locate by course number
 
-    // iterate through the course sections
+    // Iterate through the course sections
     for (let i = 0; i < classNumCourses.length; i++)
     {
         // if we find the name 
         if (classNumCourses[i]['name'] === `${className} ${input[1].toUpperCase()}`)
         {
             // return the course information into this string format
+            // add WQB section if it has one
             if (classNumCourses[i]["WQB"].length > 0)
                 return `${classNumCourses[i]['name']} - ${classNumCourses[i]['title']}\n\n${chopDesc(classNumCourses[i]['description'])}\nCredits: ${classNumCourses[i]['credits']}\nWQB: ${classNumCourses[i]["WQB"]}`    
             else
