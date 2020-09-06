@@ -7,6 +7,7 @@ let rawdata2 = fs.readFileSync(path.resolve(__dirname,'../data/allCourses.json')
 let everyCourseData = JSON.parse(rawdata2)
 
 
+
 // Desc: the main function that search up the course informations
 const findClass = (input) => {
     // Base case 1: return error when user's input is not in the right format
@@ -14,6 +15,7 @@ const findClass = (input) => {
         return "Please type the course name and number like the example (ex. cmpt 300)"
 
     var className = input[0].toUpperCase()
+    var classNum = input[1].toUpperCase()
     var checkClassExist = everyCourseData['children'][checkFaculty(className)]
 
     // Base case 2: return 'course name not found' if the course name does not exist
@@ -22,7 +24,6 @@ const findClass = (input) => {
 
     var facCourses = checkClassExist['children']                                                    // locate by faculty/department
     var classNameCourses = facCourses[checkClassName(facCourses, className)]['children']            // locate by course name
-
     var checkClassNumExist = classNameCourses[checkClassNum(classNameCourses, input[1])]
     
     // Base case 3: return 'course number not found' if the course number does not exist
@@ -35,18 +36,46 @@ const findClass = (input) => {
     for (let i = 0; i < classNumCourses.length; i++)
     {
         // if we find the name 
-        if (classNumCourses[i]['name'] === `${className} ${input[1].toUpperCase()}`)
+        if (classNumCourses[i]['name'] === `${className} ${classNum}`)
         {
-            // return the course information into this string format
-            // add WQB section if it has one
+            // initialize the course object with descriptions & credits
+            var courseInfo = `${classNumCourses[i]['name']} - ${classNumCourses[i]['title']}\n\n${chopDesc(classNumCourses[i]['description'])}\nCredits: ${classNumCourses[i]['credits']}`
+            
+            /**
+             * return the course information into this string format
+             * add WQB section if it has one
+             */
             if (classNumCourses[i]["WQB"].length > 0)
-                return `${classNumCourses[i]['name']} - ${classNumCourses[i]['title']}\n\n${chopDesc(classNumCourses[i]['description'])}\nCredits: ${classNumCourses[i]['credits']}\nWQB: ${classNumCourses[i]["WQB"]}`    
+                return `${courseInfo}\nWQB: ${classNumCourses[i]["WQB"]}\n\nLink: ${getUrl(className, classNum)}`    
             else
-                return `${classNumCourses[i]['name']} - ${classNumCourses[i]['title']}\n\n${chopDesc(classNumCourses[i]['description'])}\nCredits: ${classNumCourses[i]['credits']}`
+                return `${courseInfo}\n\nLink: ${getUrl(className, classNum)}`
         }
     }
     return 'Sorry I can\'t find it, Please try again'
 }
+
+
+
+// Desc: return the URL link to the course page
+const getUrl = (courseName, courseNum) => {
+    var date = new Date()
+    var month = date.getMonth()+1
+    var year = date.getFullYear()
+    var term = ''
+    var lowerCourseName = courseName.toLowerCase()
+    var lowerCourseNum = courseNum.toLowerCase()
+
+    if (month <= 4) {
+        term = 'spring'
+    } else if (month >= 5 && month <= 8) {
+        term = 'summer'
+    } else {
+        term = 'fall'
+    }
+
+    return `http://www.sfu.ca/students/calendar/${year}/${term}/courses/${lowerCourseName}/${lowerCourseNum}.html`
+}
+
 
 
 // Desc: split description into 2 part (course description and prerequisite)
@@ -85,6 +114,7 @@ const chopDesc = (description) => {
 }
 
 
+
 // Desc: find the class name section based on the selected class name
 const checkClassName = (courseList, className) => {
     for (let i = 0; i < courseList.length; i++)
@@ -94,6 +124,7 @@ const checkClassName = (courseList, className) => {
     }
     return null
 }
+
 
 
 // Desc: find the right index from the facualty
