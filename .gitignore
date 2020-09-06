@@ -3,3 +3,5 @@
 .DS_Store
 node_modules
 dockerRun.txt
+all_courses_output.txt
+Courses_File2.json
