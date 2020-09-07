@@ -8,3 +8,9 @@ Course Navigator is a Discord bot that can help you find information for every S
 
 ## The demo
 ![demo](assets/demo.gif)
+
+## Other Documentations
+
+* [How to Contribute?](https://github.com/engichang1467/CourseNavigator/wiki/How-to-Contribute)
+* [Creating Bot and Attaching it to a Development Server](https://github.com/engichang1467/CourseNavigator/wiki/Creating-Bot-and-Attaching-it-to-a-Development-Server)
+* [Software Engineering and Process Document](https://github.com/engichang1467/CourseNavigator/wiki/Software-Engineering-and-Process-Document) 
