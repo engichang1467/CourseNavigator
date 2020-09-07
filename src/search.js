@@ -16,6 +16,7 @@ const findClass = (input) => {
 
     // Iniitialize variable where it capitalize both course name and number
     var className = input[0].toUpperCase(), classNum = input[1].toUpperCase()
+    // Initialize variable to check if the object still exist
     var checkClassExist = everyCourseData['children'][checkFaculty(className)]
 
     // Base case 2: return 'course name not found' if the course name does not exist
@@ -24,6 +25,7 @@ const findClass = (input) => {
 
     var facCourses = checkClassExist['children']                                                    // locate by faculty/department
     var classNameCourses = facCourses[checkClassName(facCourses, className)]['children']            // locate by course name
+    // Initialize variable to check if the object still exist
     var checkClassNumExist = classNameCourses[checkClassNum(classNameCourses, input[1])]
     
     // Base case 3: return 'course number not found' if the course number does not exist
@@ -38,15 +40,12 @@ const findClass = (input) => {
         // Comparing the course ID with the ID inputed by the user
         if (classNumCourses[i]['name'] === `${className} ${classNum}`)
         {
-            // initialize the course object with descriptions & credits
+            // Initialize the course object with descriptions & credits
             var courseInfo = `**${classNumCourses[i]['name']}** - ${classNumCourses[i]['title']}\n\n${chopDesc(classNumCourses[i]['description'])}\n**Credits:** ${classNumCourses[i]['credits']}`
             
-            /**
-             * return the course information into this string format
-             * add WQB section if it has one
-             */
+            // Return the course information into this string format
             if (classNumCourses[i]["WQB"].length > 0)
-                return `${courseInfo}\n**WQB:** ${WQBFormat(classNumCourses[i]["WQB"])}\n\n**Link:** ${getUrl(className, classNum)}`    
+                return `${courseInfo}\n**WQB:** ${WQBFormat(classNumCourses[i]["WQB"])}\n\n**Link:** ${getUrl(className, classNum)}`    // Add the WQB section if it has one
             else
                 return `${courseInfo}\n\n**Link:** ${getUrl(className, classNum)}`
         }
@@ -61,13 +60,13 @@ const getDate = () => {
     // date - initialize new Date object, month - retrieve current month, year - retrieve current year
     var date = new Date(), month = date.getMonth()+1, year = date.getFullYear(), term = ''
 
-    if (month <= 4) {
+    if (month <= 4)
         term = 'spring'
-    } else if (month >= 5 && month <= 8) {
+    else if (month >= 5 && month <= 8)
         term = 'summer'
-    } else {
+    else
         term = 'fall'
-    }
+
     return [term, year.toString()]      // return both term and year as a string array
 }
 
@@ -75,7 +74,9 @@ const getDate = () => {
 
 // Desc: return the URL link to the course page
 const getUrl = (courseName, courseNum) => {
-    // term - current term (ex. Fall 2020), lowerCourseName - course name lowercase, lowerCourseNum - course number lowercase
+    // term - current term (ex. Fall 2020)
+    // lowerCourseName - course name lowercase
+    // lowerCourseNum - course number lowercase
     var term = getDate(), lowerCourseName = courseName.toLowerCase(), lowerCourseNum = courseNum.toLowerCase()
     return `http://www.sfu.ca/students/calendar/${term[1]}/${term[0]}/courses/${lowerCourseName}/${lowerCourseNum}.html`
 }
@@ -97,8 +98,7 @@ const chopDesc = (description) => {
         }  
         else if(i === descArr.length-1)
         {
-            // it will not add an extra space when index is close to the end
-            descTxt += descArr[i]
+            descTxt += descArr[i]  // it will not add an extra space when index is close to the end
             break
         } 
         else 
@@ -110,13 +110,12 @@ const chopDesc = (description) => {
     {
         for (let j = tmp; j < descArr.length; j++)
         {
-            if (descArr[j] === "Prerequisite:" || descArr[j] === "Corequisite:") {
-                prereq += "**" + descArr[j] + "** "
-            }
+            if (descArr[j] === "Prerequisite:" || descArr[j] === "Corequisite:")
+                prereq += "**" + descArr[j] + "** "         // Bold the word 'Prerequisite' or 'Corequisite'
             else if (j === descArr.length - 1)
-                prereq += descArr[j]    // reducing extra space in the end
+                prereq += descArr[j]                        // Reducing extra space in the end
             else
-                prereq += descArr[j] + " "
+                prereq += descArr[j] + " "                  // Adding space
         }
         return `${descTxt}\n\n${prereq}`
     }
