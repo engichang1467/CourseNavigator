@@ -14,8 +14,8 @@ const findClass = (input) => {
     if (input.length === 1 || input.length > 2)
         return "Please type the course name and number like the example (ex. cmpt 300)"
 
-    var className = input[0].toUpperCase()
-    var classNum = input[1].toUpperCase()
+    // Iniitialize variable where it capitalize both course name and number
+    var className = input[0].toUpperCase(), classNum = input[1].toUpperCase()
     var checkClassExist = everyCourseData['children'][checkFaculty(className)]
 
     // Base case 2: return 'course name not found' if the course name does not exist
@@ -35,20 +35,20 @@ const findClass = (input) => {
     // Iterate through the course sections
     for (let i = 0; i < classNumCourses.length; i++)
     {
-        // if we find the name 
+        // Comparing the course ID with the ID inputed by the user
         if (classNumCourses[i]['name'] === `${className} ${classNum}`)
         {
             // initialize the course object with descriptions & credits
-            var courseInfo = `${classNumCourses[i]['name']} - ${classNumCourses[i]['title']}\n\n${chopDesc(classNumCourses[i]['description'])}\nCredits: ${classNumCourses[i]['credits']}`
+            var courseInfo = `**${classNumCourses[i]['name']}** - ${classNumCourses[i]['title']}\n\n${chopDesc(classNumCourses[i]['description'])}\n**Credits:** ${classNumCourses[i]['credits']}`
             
             /**
              * return the course information into this string format
              * add WQB section if it has one
              */
             if (classNumCourses[i]["WQB"].length > 0)
-                return `${courseInfo}\nWQB: ${classNumCourses[i]["WQB"]}\n\nLink: ${getUrl(className, classNum)}`    
+                return `${courseInfo}\n**WQB:** ${WQBFormat(classNumCourses[i]["WQB"])}\n\n**Link:** ${getUrl(className, classNum)}`    
             else
-                return `${courseInfo}\n\nLink: ${getUrl(className, classNum)}`
+                return `${courseInfo}\n\n**Link:** ${getUrl(className, classNum)}`
         }
     }
     return 'Sorry I can\'t find it, Please try again'
@@ -56,14 +56,10 @@ const findClass = (input) => {
 
 
 
-// Desc: return the URL link to the course page
-const getUrl = (courseName, courseNum) => {
-    var date = new Date()
-    var month = date.getMonth()+1
-    var year = date.getFullYear()
-    var term = ''
-    var lowerCourseName = courseName.toLowerCase()
-    var lowerCourseNum = courseNum.toLowerCase()
+// Desc: get current term and year
+const getDate = () => {
+    // date - initialize new Date object, month - retrieve current month, year - retrieve current year
+    var date = new Date(), month = date.getMonth()+1, year = date.getFullYear(), term = ''
 
     if (month <= 4) {
         term = 'spring'
@@ -72,8 +68,16 @@ const getUrl = (courseName, courseNum) => {
     } else {
         term = 'fall'
     }
+    return [term, year.toString()]      // return both term and year as a string array
+}
 
-    return `http://www.sfu.ca/students/calendar/${year}/${term}/courses/${lowerCourseName}/${lowerCourseNum}.html`
+
+
+// Desc: return the URL link to the course page
+const getUrl = (courseName, courseNum) => {
+    // term - current term (ex. Fall 2020), lowerCourseName - course name lowercase, lowerCourseNum - course number lowercase
+    var term = getDate(), lowerCourseName = courseName.toLowerCase(), lowerCourseNum = courseNum.toLowerCase()
+    return `http://www.sfu.ca/students/calendar/${term[1]}/${term[0]}/courses/${lowerCourseName}/${lowerCourseNum}.html`
 }
 
 
@@ -81,9 +85,8 @@ const getUrl = (courseName, courseNum) => {
 // Desc: split description into 2 part (course description and prerequisite)
 const chopDesc = (description) => {
 
-    var descArr = description.split(" ")
-    var descTxt = ""
-    var prereq = ""
+    // descArr - splitting description string into an array of words, desTxt - initialize string for course description, prereq - initialize string for prereq/coreq
+    var descArr = description.split(" "), descTxt = "", prereq = ""
     
     for (let i = 0; i < descArr.length; i++)
     {
@@ -106,8 +109,15 @@ const chopDesc = (description) => {
     if (tmp)
     {
         for (let j = tmp; j < descArr.length; j++)
-            prereq += descArr[j] + " "
-        
+        {
+            if (descArr[j] === "Prerequisite:" || descArr[j] === "Corequisite:") {
+                prereq += "**" + descArr[j] + "** "
+            }
+            else if (j === descArr.length - 1)
+                prereq += descArr[j]    // reducing extra space in the end
+            else
+                prereq += descArr[j] + " "
+        }
         return `${descTxt}\n\n${prereq}`
     }
     return `${descTxt}`
@@ -123,6 +133,21 @@ const checkClassName = (courseList, className) => {
             return i
     }
     return null
+}
+
+
+
+// Desc: Providing better format by adding space in between
+const WQBFormat = (WQB) => {
+    WQBstr = ""
+    for (let i = 0; i < WQB.length; i++)
+    {
+        if (i === WQB.length - 1)
+            WQBstr += WQB[i]
+        else
+            WQBstr += WQB[i] + ", "     // Adding an extra space, so its more readable
+    }
+    return WQBstr
 }
 
 
@@ -148,6 +173,7 @@ const checkFaculty = (className) => {
 }
 
 
+
 // Desc: check the course number section
 const checkClassNum = (courseList, classNum) => {
     var num = `${classNum[0]}XX`
@@ -160,4 +186,5 @@ const checkClassNum = (courseList, classNum) => {
 }
 
 
-module.exports = { findClass, chopDesc, checkClassName, checkFaculty, checkClassNum }
+
+module.exports = { findClass, chopDesc, checkClassName, checkFaculty, checkClassNum, WQBFormat, getDate }
