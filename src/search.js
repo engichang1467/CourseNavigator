@@ -55,6 +55,42 @@ const findClass = (input) => {
 
 
 
+// Desc: the main function that search up the course informations for next semester (see findClass for detailed comments)
+const findNextClass = (input) => {
+    if (input.length === 1 || input.length > 2)
+        return "Please type the course name and number like the example (ex. cmpt 300)"
+
+    var className = input[0].toUpperCase(), classNum = input[1].toUpperCase()
+    var checkClassExist = everyCourseData['children'][checkFaculty(className)]
+
+    if (checkClassExist  === undefined) 
+        return 'Sorry I can\'t find the course name, Please try again'
+
+    var facCourses = checkClassExist['children']
+    var classNameCourses = facCourses[checkClassName(facCourses, className)]['children']
+    var checkClassNumExist = classNameCourses[checkClassNum(classNameCourses, input[1])]
+    
+    if (checkClassNumExist  === undefined) 
+        return 'Sorry I can\'t find the course number, Please try again'
+
+    var classNumCourses = checkClassNumExist['children']
+
+    for (let i = 0; i < classNumCourses.length; i++)
+    {
+        if (classNumCourses[i]['name'] === `${className} ${classNum}`)
+        {
+            var courseInfo = `**${classNumCourses[i]['name']}** - ${classNumCourses[i]['title']}\n\n${chopDesc(classNumCourses[i]['description'])}\n**Credits:** ${classNumCourses[i]['credits']}`
+            if (classNumCourses[i]["WQB"].length > 0)
+                return `${courseInfo}\n**WQB:** ${WQBFormat(classNumCourses[i]["WQB"])}\n\n**Link:** ${getNextUrl(className, classNum)}`    // Add the WQB section if it has one
+            else
+                return `${courseInfo}\n\n**Link:** ${getNextUrl(className, classNum)}`
+        }
+    }
+    return 'Sorry I can\'t find it, Please try again'
+}
+
+
+
 // Desc: get current term and year
 const getDate = () => {
     // date - initialize new Date object, month - retrieve current month, year - retrieve current year
@@ -72,12 +108,42 @@ const getDate = () => {
 
 
 
+// Desc: get next term and year (see getDate for comments)
+const getNextDate = () => {
+    var date = new Date(), month = date.getMonth()+1, year = date.getFullYear(), term = '', newMonth = date.getMonth()+5
+
+    if (month <= 4) 
+    {
+        term = 'summer'
+    } 
+    else if (month >= 5 && month <= 8) 
+    {
+        term = 'fall'
+    } 
+    else 
+    {
+        term = 'spring'
+        year += 1
+    }
+    return [term, year.toString()]
+}
+
+
+
 // Desc: return the URL link to the course page
 const getUrl = (courseName, courseNum) => {
     // term - current term (ex. Fall 2020)
     // lowerCourseName - course name lowercase
     // lowerCourseNum - course number lowercase
     var term = getDate(), lowerCourseName = courseName.toLowerCase(), lowerCourseNum = courseNum.toLowerCase()
+    return `http://www.sfu.ca/students/calendar/${term[1]}/${term[0]}/courses/${lowerCourseName}/${lowerCourseNum}.html`
+}
+
+
+
+// Desc: return the URL link to the course page for next semester
+const getNextUrl = (courseName, courseNum) => {
+    var term = getNextDate(), lowerCourseName = courseName.toLowerCase(), lowerCourseNum = courseNum.toLowerCase()
     return `http://www.sfu.ca/students/calendar/${term[1]}/${term[0]}/courses/${lowerCourseName}/${lowerCourseNum}.html`
 }
 
@@ -186,4 +252,4 @@ const checkClassNum = (courseList, classNum) => {
 
 
 
-module.exports = { findClass, chopDesc, checkClassName, checkFaculty, checkClassNum, WQBFormat, getDate }
+module.exports = { findClass, findNextClass, chopDesc, checkClassName, checkFaculty, checkClassNum, WQBFormat, getDate, getNextDate }
