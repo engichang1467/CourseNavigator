@@ -31,10 +31,17 @@ client.on('message', (message) => {
                 return message.channel.send("Please provide the Course ID\nPlease type \".help\" for futher instructions")
             else
                 return message.channel.send(search.findClass(args))
-        } 
+        }
+        if (CMD_NAME === 'enroll')
+        {
+            if (args.length === 0)
+                return message.channel.send("Please provide the Course ID\nPlease type \".help\" for futher instructions")
+            else
+                return message.channel.send(search.findNextClass(args))
+        }  
         if (CMD_NAME === 'help')
         {
-            return message.channel.send("Hi there, I'm the Course Navigator!!!\nI'll help you find the information that you need for any course at SFU\n\nYou can search up any courses here by typing the following command\n```.find cmpt 165```")
+            return message.channel.send("Hi there, I'm the Course Navigator!!!\nI'll help you find the information that you need for any course at SFU\n\nYou can search up any courses here by typing the following command\n```.find cmpt 165```\nYou can also see the available courses for next semester with the following command\n```.enroll cmpt 165```")
         }
     }
 })
